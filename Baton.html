@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Loja Euler - Cosméticos Naturais</title>
+  <style>
+    body {
+      font-family: 'Inter', Arial, sans-serif;
+      background-color: #faf7f2;
+      color: #333;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      background-color: #a5c9a1;
+      padding: 20px;
+      text-align: center;
+      color: white;
+    }
+
+    nav {
+      display: flex;
+      justify-content: center;
+      background-color: #e3f0df;
+      padding: 10px;
+      gap: 20px;
+    }
+
+    nav a {
+      text-decoration: none;
+      color: #2c3e2e;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    nav a:hover {
+      color: #4a694a;
+    }
+
+    .conteudo {
+      padding: 30px;
+      text-align: center;
+    }
+
+    .produtos {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      padding: 30px;
+    }
+
+    .card {
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      padding: 15px;
+      text-align: center;
+      transition: transform 0.2s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+    }
+
+    .card img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      border-radius: 10px;
+    }
+
+    .card h3 {
+      color: #2f5132;
+      margin: 10px 0;
+    }
+
+    .card p {
+      font-size: 14px;
+      color: #555;
+      margin: 5px 0;
+    }
+
+    .card button {
+      background-color: #84b98f;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    .card button:hover {
+      background-color: #6ea879;
+    }
+
+    footer {
+      background-color: #a5c9a1;
+      color: white;
+      text-align: center;
+      padding: 20px;
+      margin-top: 30px;
+    }
+
+    /* Estilo do painel do carrinho */
+    #painelCarrinho {
+      position: fixed;
+      right: 20px;
+      top: 100px;
+      width: 320px;
+      background-color: #f0f8f0;
+      border: 1px solid #84b98f;
+      border-radius: 10px;
+      padding: 15px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+      display: none;
+    }
+
+    #painelCarrinho ul {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 10px 0;
+    }
+
+    #painelCarrinho button {
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>Loja Euler</h1>
+    <p>Beleza natural, diretamente da natureza.</p>
+  </header>
+
+  <nav>
+    <a id="btnInicio">Início</a>
+    <a id="btnProdutos">Produtos</a>
+    <a id="btnSobre">Sobre</a>
+    <a id="btnContato">Contato</a>
+  </nav>
+
+  <main id="conteudoPrincipal" class="conteudo">
+    <h2>Bem-vindo à nossa loja!</h2>
+    <p>
+      Na Loja Euler, acreditamos que a verdadeira beleza vem da natureza. Somos uma indústria dedicada à produção de cosméticos naturais de alta qualidade, desenvolvidos para cuidar da pele, do corpo e do bem-estar de cada pessoa, respeitando o meio ambiente em cada etapa do processo.
+    </p>
+    <p>
+      Nossos produtos são cuidadosamente formulados a partir de ingredientes 100% naturais, livres de químicos agressivos, parabenos e sulfatos. Cada sabonete, óleo corporal ou creme facial é feito com extratos vegetais, óleos essenciais e minerais que oferecem hidratação profunda, nutrição e proteção natural. A combinação de ciência e natureza nos permite criar fórmulas eficazes, seguras e sustentáveis.
+    </p>
+    <p>
+      Seja você também parte dessa filosofia: escolha produtos que respeitam a sua pele e o mundo ao seu redor. Descubra a diferença de se cuidar com consciência, com a Loja Euler – Beleza natural, feita para durar.
+    </p>
+  </main>
+
+  <!-- Painel do carrinho -->
+  <div id="painelCarrinho">
+    <h3>Carrinho</h3>
+    <ul id="listaCarrinho"></ul>
+    <p><strong>Total: R$ <span id="totalCarrinho">0.00</span></strong></p>
+    <button id="btnEsvaziarCarrinho" style="background-color: #e74c3c; color: white; border: none; padding: 8px 12px; border-radius: 5px;">Esvaziar Carrinho</button>
+  </div>
+
+  <footer>
+    <p>Siga-nos nas redes sociais:</p>
+    <p>📱 TikTok: Loja_Euler</p>
+    <p>🌿 Instagram: @Loja_Euler</p>
+  </footer>
+
+  <script>
+    const conteudo = document.getElementById('conteudoPrincipal');
+
+    // Conteúdo inicial do início
+    const conteudoInicio = conteudo.innerHTML;
+
+    // Carrinho
+    let carrinho = [];
+    const produtos = [
+      { nome: "Sabonete Vegetal Natural", preco: 11.99 },
+      { nome: "Sabonete de Lavanda", preco: 29.99 },
+      { nome: "Óleo Corporal Revitalizante", preco: 7.99 }
+    ];
+
+    // Função atualizar carrinho visual
+    function atualizarCarrinho() {
+      const painel = document.getElementById('painelCarrinho');
+      const lista = document.getElementById('listaCarrinho');
+      const totalElemento = document.getElementById('totalCarrinho');
+
+      if (carrinho.length === 0) {
+        painel.style.display = 'none';
+        return;
+      }
+
+      painel.style.display = 'block';
+      lista.innerHTML = '';
+
+      // Contar quantidade de cada produto
+      const contagem = {};
+      carrinho.forEach((item, index) => {
+        if (!contagem[item.nome]) contagem[item.nome] = { ...item, indices: [index], qtd: 1 };
+        else { contagem[item.nome].qtd++; contagem[item.nome].indices.push(index); }
+      });
+
+      // Mostrar produtos com botão remover
+      Object.values(contagem).forEach(item => {
+        const li = document.createElement('li');
+        li.style.marginBottom = "5px";
+
+        const nome = document.createTextNode(`${item.nome} x${item.qtd} - R$ ${(item.preco * item.qtd).toFixed(2)} `);
+
+        const btnRemover = document.createElement('button');
+        btnRemover.textContent = "Remover";
+        btnRemover.style.backgroundColor = "#e67e22";
+        btnRemover.style.color = "white";
+        btnRemover.style.border = "none";
+        btnRemover.style.padding = "3px 6px";
+        btnRemover.style.borderRadius = "4px";
+        btnRemover.style.marginLeft = "5px";
+
+        btnRemover.addEventListener('click', () => {
+          const indiceParaRemover = item.indices.shift();
+          if (indiceParaRemover !== undefined) {
+            carrinho.splice(indiceParaRemover, 1);
+            atualizarCarrinho();
+          }
+        });
+
+        li.appendChild(nome);
+        li.appendChild(btnRemover);
+        lista.appendChild(li);
+      });
+
+      const total = carrinho.reduce((soma, item) => soma + item.preco, 0);
+      totalElemento.textContent = total.toFixed(2);
+    }
+
+    // Adicionar eventos aos botões de produtos
+    function adicionarEventosCarrinho() {
+      const botoes = document.querySelectorAll('.btnCarrinho');
+      botoes.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const id = parseInt(btn.dataset.id);
+          carrinho.push(produtos[id]);
+          atualizarCarrinho();
+        });
+      });
+    }
+
+    document.getElementById('btnInicio').addEventListener('click', () => {
+      conteudo.innerHTML = conteudoInicio;
+    });
+
+    document.getElementById('btnProdutos').addEventListener('click', () => {
+      conteudo.innerHTML = `
+        <section class="produtos">
+          <div class="card">
+            <a href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRyHHo9GvlBAGkMKldGzvhi3_miveK1-2dZhuDm6NKTsA&s=10" target="_blank">
+              <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRyHHo9GvlBAGkMKldGzvhi3_miveK1-2dZhuDm6NKTsA&s=10" alt="Creme Facial Orgânico">
+            </a>
+            <h3>Sabonete Vegetal Natural</h3>
+            <p>Hidratação intensa com extratos naturais e óleos vegetais.</p>
+            <p><strong>R$ 11,99</strong></p>
+            <button class="btnCarrinho" data-id="0">Adicionar ao Carrinho</button>
+          </div>
+
+          <div class="card">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSUihv_TqJgJ-8iLk3tRc7Iy1u4qvcbRNJhALNzg0wD-g&s=10" alt="Sabonete de Lavanda">
+            <h3>Sabonete de Lavanda</h3>
+            <p>Feito com óleos essenciais e livre de químicos agressivos.</p>
+            <p><strong>R$ 29,99</strong></p>
+            <button class="btnCarrinho" data-id="1">Adicionar ao Carrinho</button>
+          </div>
+
+          <div class="card">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQolPNqCR7_rsCDMcvStayJH5wcG0pEK2Mm6CtGY_AO1Q&s=10" alt="Óleo Corporal Revitalizante">
+            <h3>Óleo Corporal Revitalizante</h3>
+            <p>Nutre profundamente e devolve o brilho natural da pele.</p>
+            <p><strong>R$ 7,99</strong></p>
+            <button class="btnCarrinho" data-id="2">Adicionar ao Carrinho</button>
+          </div>
+        </section>
+      `;
+      adicionarEventosCarrinho();
+    });
+
+    document.getElementById('btnSobre').addEventListener('click', () => {
+      conteudo.innerHTML = `
+        <h2>Sobre Nós</h2>
+        <p>
+          A Loja Euler nasceu com uma missão clara: transformar a maneira como as pessoas cuidam da pele e do corpo, mostrando que é possível aliar eficácia, saúde e sustentabilidade. Mais do que uma simples marca, somos uma instituição comprometida com o bem-estar e a preservação do meio ambiente, que acredita que cada produto deve refletir respeito pela natureza e pelo consumidor.
+        </p>
+        <p>
+          Desde o início, investimos em pesquisa e desenvolvimento para criar cosméticos que realmente entregam resultados, sem recorrer a químicos prejudiciais. Nossa equipe multidisciplinar reúne especialistas em cosmetologia, botânica e sustentabilidade, garantindo que cada formulação seja segura, eficaz e responsável.
+        </p>
+        <p>
+          Na Loja Euler, inovação anda de mãos dadas com tradição. Resgatamos técnicas naturais e artesanais de cuidado com a pele, enquanto aplicamos os avanços da ciência moderna para potencializar seus benefícios. Cada sabonete, óleo ou creme não é apenas um produto: é o resultado de estudo profundo, testes rigorosos e um compromisso contínuo com a qualidade.
+        </p>
+        <p>
+          Nosso compromisso vai além da pele. Acreditamos que cuidar do corpo deve significar cuidar do planeta. Por isso, nossas embalagens são recicláveis, nossos processos são otimizados para reduzir desperdício, e os ingredientes são obtidos de maneira ética e sustentável, muitas vezes em parceria com pequenos produtores locais.
+        </p>
+      `;
+    });
+
+    document.getElementById('btnContato').addEventListener('click', () => {
+      conteudo.innerHTML = `
+        <h2>Contato</h2>
+        <p>📧 Email: contato@lojaeuler.com.br</p>
+        <p>📞 Telefone: (11) 91603-3685</p>
+        <p>📍 Endereço: Rua São Carlos, n°322, Nova Esperança - Manaus/AM</p>
+      `;
+    });
+
+    // Evento esvaziar carrinho
+    document.getElementById('btnEsvaziarCarrinho').addEventListener('click', () => {
+      carrinho = [];
+      atualizarCarrinho();
+    });
+
+  </script>
+</body>
+</html>
